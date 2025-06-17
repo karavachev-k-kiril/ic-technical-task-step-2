@@ -1,0 +1,28 @@
+.favorites-title {
+	font-size: 1.875rem;
+	font-weight: 700;
+	text-align: center;
+	margin-bottom: 2rem;
+	color: var(--text-dark);
+}
+
+.favorites-grid {
+	display: grid;
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+	gap: 2rem;
+}
+
+.favorites-grid.favorites-grid-in-drawer {
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+.favorites-plain-list {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius-md);
+	overflow: hidden;
+	background-color: var(--bg-light);
+	box-shadow: var(--shadow-md);
+}
