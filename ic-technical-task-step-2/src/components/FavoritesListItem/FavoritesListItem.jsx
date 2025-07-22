@@ -2,7 +2,7 @@ import React from 'react';
 import HeartIcon from '../UI/Icons/HeartIcon';
 import PhoneIcon from '../UI/Icons/PhoneIcon';
 import './FavoritesListItem.css';
-import '../../constants/types.js';
+import '../../constants/types.js'; // Импорт за типовете
 
 /**
  * @param {{
