@@ -2,7 +2,15 @@ import React from 'react';
 import HeartIcon from '../UI/Icons/HeartIcon';
 import PhoneIcon from '../UI/Icons/PhoneIcon';
 import './FavoritesListItem.css';
+import '../../constants/types.js';
 
+/**
+ * @param {{
+ * ws: Workshop;
+ * onToggleFav: (ws: Workshop) => void;
+ * countryCode: string;
+ * }} props
+ */
 const FavoritesListItem = ({ ws, onToggleFav, countryCode }) => {
     const linkUrl = `https://motointegrator.com/${countryCode.toLowerCase()}/en/carworkshop/${ws.address?.localitySlug}/${ws.hashedKhCode}-${ws.slug}`;
 
@@ -30,7 +38,7 @@ const FavoritesListItem = ({ ws, onToggleFav, countryCode }) => {
                     </a>
                 )}
 
-                <button onClick={onToggleFav} title="Toggle Favorite" className="favorite-list-toggle-button">
+                <button onClick={() => onToggleFav(ws)} title="Toggle Favorite" className="favorite-list-toggle-button">
                     <HeartIcon isFav={true} />
                 </button>
             </div>
@@ -38,4 +46,4 @@ const FavoritesListItem = ({ ws, onToggleFav, countryCode }) => {
     );
 };
 
-export default FavoritesListItem;
+export default React.memo(FavoritesListItem);
