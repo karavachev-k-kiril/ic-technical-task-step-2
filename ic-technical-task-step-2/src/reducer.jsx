@@ -18,8 +18,7 @@ export function reducer(state, action) {
       return { ...state, brand: action.payload, page: 1 };
     case 'SET_SEARCH_QUERY':
       return { ...state, searchQuery: action.payload };
-    case 'SEARCH':
-
+    case 'HANDLE_SEARCH':
       return { ...state, page: 1 };
     default:
       throw new Error(`Unknown action type: ${action.type}`);
