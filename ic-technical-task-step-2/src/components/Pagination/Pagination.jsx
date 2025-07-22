@@ -1,16 +1,24 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import './Pagination.css';
 
+/**
+ * @param {{
+ * page: number;
+ * totalPages: number;
+ * onPageChange: (newPage: number) => void;
+ * isLoading: boolean;
+ * }} props
+ */
 const Pagination = ({ page, totalPages, onPageChange, isLoading }) => {
     if (totalPages <= 1) return null;
 
-    const handlePageClick = (newPage) => {
+    const handlePageClick = useCallback((newPage) => {
         if (newPage >= 1 && newPage <= totalPages && !isLoading) {
             onPageChange(newPage);
         }
-    };
+    }, [totalPages, isLoading, onPageChange]);
 
-    const renderPageNumbers = () => {
+    const renderPageNumbers = useMemo(() => {
         const pageNumbers = [];
         const maxButtons = 6;
         let startPage, endPage;
@@ -39,13 +47,14 @@ const Pagination = ({ page, totalPages, onPageChange, isLoading }) => {
                     key={i}
                     onClick={() => handlePageClick(i)}
                     className={`pagination-number ${page === i ? 'active' : ''}`}
+                    disabled={isLoading}
                 >
                     {i}
                 </button>
             );
         }
         return pageNumbers;
-    };
+    }, [page, totalPages, isLoading, handlePageClick]);
 
     return (
         <div className="pagination-container">
@@ -53,7 +62,7 @@ const Pagination = ({ page, totalPages, onPageChange, isLoading }) => {
                 &lt;
             </button>
             <div className="pagination-numbers-desktop">
-                {renderPageNumbers()}
+                {renderPageNumbers}
             </div>
             <div className="pagination-numbers-mobile">
                 Page {page} of {totalPages}
@@ -65,4 +74,4 @@ const Pagination = ({ page, totalPages, onPageChange, isLoading }) => {
     );
 }
 
-export default Pagination;
+export default React.memo(Pagination);
