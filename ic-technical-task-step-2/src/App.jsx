@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useWorkshops } from './hooks/useWorkshops';
 import { useFavorites } from './hooks/useFavorites';
+import { useStateContext } from './context/StateContext';
+
 import Filters from './components/Filters/Filters';
 import WorkshopCard from './components/WorkshopCard/WorkshopCard';
 import Pagination from './components/Pagination/Pagination';
@@ -12,14 +14,14 @@ import MessageDialog from './components/UI/MessageDialog/MessageDialog';
 
 import './App.css';
 
-export default function App() {
+// Memoize list items for performance as recommended
+const MemoizedWorkshopCard = React.memo(WorkshopCard);
 
-    const [selectedCountry, setSelectedCountry] = useState('PL');
-    const [perPage, setPerPage] = useState('10');
-    const [selectedAvailability, setSelectedAvailability] = useState('-');
-    const [selectedBrand, setSelectedBrand] = useState('-');
-    const [searchQuery, setSearchQuery] = useState('');
+export default function App() {
+    const { state, dispatch } = useStateContext();
+    const { country, perPage, availability, brand, searchQuery } = state;
     const { userId, authError, isAuthLoading } = useAuth();
+    
     const {
         isLoading: isWorkshopsLoading,
         workshops,
@@ -31,81 +33,60 @@ export default function App() {
         loadMoreWorkshops,
         isFetchingMore,
         hasMore
-    } = useWorkshops('PL', 1, '10');
+    } = useWorkshops(country, 1, perPage);
+    
     const { favorites, toggleFav, favoritesError, setFavoritesError } = useFavorites(userId, searchParams.country);
 
-
-    const isLoading = isAuthLoading || isWorkshopsLoading;
     const [errorMessage, setErrorMessage] = useState('');
-
-
     const bottomRef = useRef(null);
 
+    const isLoading = isAuthLoading || isWorkshopsLoading;
 
     useEffect(() => {
         const error = authError || workshopsError || favoritesError;
         if (error) {
             setErrorMessage(error);
-            
             if (favoritesError) setFavoritesError(null);
         }
     }, [authError, workshopsError, favoritesError, setFavoritesError]);
+
     useEffect(() => {
-      
-        if (searchParams.perPage !== 'All' || !bottomRef.current) {
-            return;
-        }
+        if (searchParams.perPage !== 'All' || !bottomRef.current) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
-                
-                
- if (entries[0].isIntersecting && hasMore && !isFetchingMore && !isWorkshopsLoading) {
+                if (entries[0].isIntersecting && hasMore && !isFetchingMore && !isWorkshopsLoading) {
                     loadMoreWorkshops();
                 }
             },
-            {
-                root: null,
-               
-                 rootMargin: '0px',
-                threshold: 0.1,
-            }
+            { root: null, rootMargin: '0px', threshold: 0.1 }
         );
 
-        observer.observe(bottomRef.current);
+        const currentRef = bottomRef.current;
+        if (currentRef) {
+            observer.observe(currentRef);
+        }
 
         return () => {
-            if (bottomRef.current) {
-                observer.unobserve(bottomRef.current);
-            
- }
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            }
         };
-    }, [
-        bottomRef.current,
-        searchParams.perPage,
-        hasMore,
-        isFetchingMore,
-        isWorkshopsLoading,
-        loadMoreWorkshops
-    ]);
- const handleSearch = () => {
-        setSearchParams({
-            country: selectedCountry,
-            perPage: perPage,
-            page: 1,
-            availability: selectedAvailability,
-            brand: selectedBrand,
-            query: searchQuery,
-        });
- };
+    }, [bottomRef, searchParams.perPage, hasMore, isFetchingMore, isWorkshopsLoading, loadMoreWorkshops]);
 
-    const handlePerPageChange = (value) => {
-        setPerPage(value);
- setSearchParams(prev => ({ ...prev, perPage: value, page: 1 }));
-    };
- const handlePageChange = (newPage) => {
+    // Wrap handler functions with useCallback for performance
+    const handleSearch = useCallback(() => {
+        dispatch({ type: 'HANDLE_SEARCH' });
+        setSearchParams({ ...state, page: 1 });
+    }, [state, dispatch, setSearchParams]);
+
+    const handlePageChange = useCallback((newPage) => {
         setSearchParams(prev => ({ ...prev, page: newPage }));
- }
+    }, [setSearchParams]);
+    
+    const handlePerPageChange = useCallback((value) => {
+        setSearchParams(prev => ({ ...prev, perPage: value, page: 1 }));
+    }, [setSearchParams]);
 
     if (isAuthLoading) {
         return (
@@ -114,7 +95,7 @@ export default function App() {
                 <p className="initial-loading-text">Initializing...</p>
             </div>
         );
- }
+    }
 
     return (
         <div className="app">
@@ -125,92 +106,64 @@ export default function App() {
                         <CarFinderIcon />
                         <h1 className="header-title">Car Workshop Finder</h1>
                     </div>
-      {userId && <p className="user-id">User ID: {userId}</p>}
+                    {userId && <p className="user-id">User ID: {userId}</p>}
                 </div>
             </header>
 
             <main className="container main-content">
                 <Filters
-                    country={selectedCountry}
-            
-         perPage={perPage}
-                    availability={selectedAvailability}
-                    brand={selectedBrand}
                     brandOptions={availableFilters.brands}
-                    searchQuery={searchQuery}
-                    onCountryChange={setSelectedCountry}
-            
-         onPerPageChange={handlePerPageChange}
-                    onAvailabilityChange={setSelectedAvailability}
-                    onBrandChange={setSelectedBrand}
-                    onSearchQueryChange={setSearchQuery}
                     onSearch={handleSearch}
                     isLoading={isLoading}
-            
-     />
+                />
 
-                {isLoading && searchParams.perPage !== 'All' && (
-                    <Spinner />
-                )}
+                {isWorkshopsLoading && searchParams.perPage !== 'All' && <Spinner />}
 
-                {!isLoading && workshops.length === 0 && !workshopsError && (
-             
-        <p className="no-results-message">No workshops found for the selected criteria.</p>
+                {!isWorkshopsLoading && workshops.length === 0 && !workshopsError && (
+                    <p className="no-results-message">No workshops found for the selected criteria.</p>
                 )}
                 
                 {workshops.length > 0 && (
                     <>
-              
-           <div className="workshops-grid">
+                        <div className="workshops-grid">
                             {workshops.map(ws => (
-                                <WorkshopCard
-                           
-         key={ws.hashedKhCode}
+                                <MemoizedWorkshopCard
+                                    key={ws.hashedKhCode}
                                     ws={ws}
                                     isFav={favorites.some(f => f.id === ws.hashedKhCode)}
-               
-                     onToggleFav={() => toggleFav(ws)}
+                                    onToggleFav={() => toggleFav(ws)}
                                     countryCode={searchParams.country}
                                 />
-         
-                    ))}
+                            ))}
                         </div>
 
                         {searchParams.perPage !== 'All' && (
                             <Pagination
- 
                                 page={pagination.page}
                                 totalPages={pagination.totalPages}
                                 onPageChange={handlePageChange}
-     
-                             isLoading={isLoading}
+                                isLoading={isLoading}
                             />
                         )}
-
-                     
-   {searchParams.perPage === 'All' && (
+                       
+                        {searchParams.perPage === 'All' && (
                             <div ref={bottomRef} style={{ padding: '20px', textAlign: 'center' }}>
-                                {isFetchingMore ?
- (
+                                {isFetchingMore ? (
                                     <Spinner />
-                                ) : hasMore ?
- (
+                                ) : hasMore ? (
                                     <p>Scroll down to load more workshops...</p>
                                 ) : (
-                         
-            <p>You've reached the end of the list!</p>
+                                    <p>You've reached the end of the list!</p>
                                 )}
                             </div>
-                       
- )}
+                        )}
                     </>
                 )}
             </main>
            
             <FavoritesDrawer
                 favorites={favorites}
-            
-     onToggleFav={toggleFav}
+                onToggleFav={toggleFav}
             />
         </div>
     );
