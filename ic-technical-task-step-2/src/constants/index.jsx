@@ -17,9 +17,9 @@ export const COUNTRIES = [
 ];
 
 export const OPEN_HOURS_OPTIONS = [
-    { name: 'Any', value: '-' },
-    { name: 'Open now', value: 'OPEN_NOW' },
-    { name: 'Open 24H', value: 'OPEN_24H' },
-    { name: 'Open after 18:00', value: 'OPEN_AFTER_18' },
-    { name: 'Open on weekends', value: 'OPEN_ON_WEEKENDS' },
+  { name: 'Any', value: '-' },
+  { name: 'Open now', value: 'OPEN_NOW' },
+  { name: 'Open 24H', value: 'OPEN_24H' },
+  { name: 'Open after 18:00', value: 'OPEN_AFTER_18' },
+  { name: 'Open on weekends', value: 'OPEN_ON_WEEKENDS' },
 ];

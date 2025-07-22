@@ -1,21 +1,21 @@
 .reviews-container {
-	display: flex;
-	align-items: center;
-	color: var(--text-muted);
-	font-size: 0.675rem;
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 0.675rem;
 }
 
 .reviews-container.placeholder {
-	justify-content: center;
-    color: var(--text-subtle);
+  justify-content: center;
+  color: var(--text-subtle);
 }
 
 .no-rating-text {
-    font-style: italic;
+  font-style: italic;
 }
 
 .reviews-score {
-	font-weight: 600;
-	margin-right: 0.25rem;
-    color: var(--text-dark);
+  font-weight: 600;
+  margin-right: 0.25rem;
+  color: var(--text-dark);
 }

@@ -11,17 +11,18 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-
-    console.error("Uncaught error:", error, errorInfo);
+    console.error('Uncaught error:', error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
-
       return (
         <div style={{ padding: '2rem', textAlign: 'center' }}>
           <h2>Something went wrong.</h2>
-          <p>We're sorry, an unexpected error occurred. Please try refreshing the page.</p>
+          <p>
+            We're sorry, an unexpected error occurred. Please try refreshing the
+            page.
+          </p>
           <details style={{ whiteSpace: 'pre-wrap' }}>
             {this.state.error && this.state.error.toString()}
           </details>

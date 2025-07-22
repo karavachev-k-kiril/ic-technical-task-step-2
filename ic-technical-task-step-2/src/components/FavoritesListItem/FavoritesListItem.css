@@ -1,73 +1,73 @@
 .favorite-list-item {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 0.75rem 1rem;
-	border-bottom: 1px solid var(--border-color);
-	background-color: var(--bg-light);
-	transition: background-color 0.2s ease-in-out;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-light);
+  transition: background-color 0.2s ease-in-out;
 }
 
 .favorite-list-item:hover {
-	background-color: var(--bg-main);
+  background-color: var(--bg-main);
 }
 
 .favorite-list-item:last-child {
-	border-bottom: none;
+  border-bottom: none;
 }
 
 .list-item-link {
-	flex-grow: 1;
-	text-decoration: none;
-	color: inherit;
-	display: flex;
-	flex-direction: column;
+  flex-grow: 1;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
 }
 
 .list-item-name {
-	font-weight: 600;
-	color: var(--text-dark);
-	font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 1rem;
 }
 
 .list-item-location {
-	font-size: 0.875rem;
-	color: var(--text-muted);
-	margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
 }
 
 .favorite-list-toggle-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    font-size: 1.25rem;
-    color: var(--text-error);
-    transition: transform 0.2s ease-in-out;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.25rem;
+  color: var(--text-error);
+  transition: transform 0.2s ease-in-out;
 }
 
 .favorite-list-toggle-button .icon-button {
-    padding: 0.5rem;
+  padding: 0.5rem;
 }
 
 .favorite-list-toggle-button:hover {
-	transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .list-item-actions {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .list-item-action-phone {
-	display: flex;
-	align-items: center;
-	cursor: pointer;
-	padding: 0.5rem;
-	transition: transform 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: transform 0.2s ease-in-out;
 }
 
 .list-item-action-phone:hover {
-	transform: scale(1.1);
+  transform: scale(1.1);
 }

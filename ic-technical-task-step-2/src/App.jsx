@@ -18,153 +18,177 @@ import './App.css';
 const MemoizedWorkshopCard = React.memo(WorkshopCard);
 
 export default function App() {
-    const { state, dispatch } = useStateContext();
-    const { country, perPage, availability, brand, searchQuery } = state;
-    const { userId, authError, isAuthLoading } = useAuth();
-    
-    const {
-        isLoading: isWorkshopsLoading,
-        workshops,
-        pagination,
-        availableFilters,
-        searchParams,
-        setSearchParams,
-        workshopsError,
-        loadMoreWorkshops,
-        isFetchingMore,
-        hasMore
-    } = useWorkshops(country, 1, perPage);
-    
-    const { favorites, toggleFav, favoritesError, setFavoritesError } = useFavorites(userId, searchParams.country);
+  const { state, dispatch } = useStateContext();
+  const { country, perPage, availability, brand, searchQuery } = state;
+  const { userId, authError, isAuthLoading } = useAuth();
 
-    const [errorMessage, setErrorMessage] = useState('');
-    const bottomRef = useRef(null);
+  const {
+    isLoading: isWorkshopsLoading,
+    workshops,
+    pagination,
+    availableFilters,
+    searchParams,
+    setSearchParams,
+    workshopsError,
+    loadMoreWorkshops,
+    isFetchingMore,
+    hasMore,
+  } = useWorkshops(country, 1, perPage);
 
-    const isLoading = isAuthLoading || isWorkshopsLoading;
+  const { favorites, toggleFav, favoritesError, setFavoritesError } =
+    useFavorites(userId, searchParams.country);
 
-    useEffect(() => {
-        const error = authError || workshopsError || favoritesError;
-        if (error) {
-            setErrorMessage(error);
-            if (favoritesError) setFavoritesError(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  const bottomRef = useRef(null);
+
+  const isLoading = isAuthLoading || isWorkshopsLoading;
+
+  useEffect(() => {
+    const error = authError || workshopsError || favoritesError;
+    if (error) {
+      setErrorMessage(error);
+      if (favoritesError) setFavoritesError(null);
+    }
+  }, [authError, workshopsError, favoritesError, setFavoritesError]);
+
+  useEffect(() => {
+    if (searchParams.perPage !== 'All' || !bottomRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          !isFetchingMore &&
+          !isWorkshopsLoading
+        ) {
+          loadMoreWorkshops();
         }
-    }, [authError, workshopsError, favoritesError, setFavoritesError]);
+      },
+      { root: null, rootMargin: '0px', threshold: 0.1 }
+    );
 
-    useEffect(() => {
-        if (searchParams.perPage !== 'All' || !bottomRef.current) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasMore && !isFetchingMore && !isWorkshopsLoading) {
-                    loadMoreWorkshops();
-                }
-            },
-            { root: null, rootMargin: '0px', threshold: 0.1 }
-        );
-
-        const currentRef = bottomRef.current;
-        if (currentRef) {
-            observer.observe(currentRef);
-        }
-
-        return () => {
-            if (currentRef) {
-                observer.unobserve(currentRef);
-            }
-        };
-    }, [bottomRef, searchParams.perPage, hasMore, isFetchingMore, isWorkshopsLoading, loadMoreWorkshops]);
-
-    // Wrap handler functions with useCallback for performance
-    const handleSearch = useCallback(() => {
-        dispatch({ type: 'HANDLE_SEARCH' });
-        setSearchParams({ ...state, page: 1 });
-    }, [state, dispatch, setSearchParams]);
-
-    const handlePageChange = useCallback((newPage) => {
-        setSearchParams(prev => ({ ...prev, page: newPage }));
-    }, [setSearchParams]);
-    
-    const handlePerPageChange = useCallback((value) => {
-        setSearchParams(prev => ({ ...prev, perPage: value, page: 1 }));
-    }, [setSearchParams]);
-
-    if (isAuthLoading) {
-        return (
-            <div className="initial-loading-container">
-                <Spinner />
-                <p className="initial-loading-text">Initializing...</p>
-            </div>
-        );
+    const currentRef = bottomRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [
+    bottomRef,
+    searchParams.perPage,
+    hasMore,
+    isFetchingMore,
+    isWorkshopsLoading,
+    loadMoreWorkshops,
+  ]);
+
+  // Wrap handler functions with useCallback for performance
+  const handleSearch = useCallback(() => {
+    dispatch({ type: 'HANDLE_SEARCH' });
+    setSearchParams({ ...state, page: 1 });
+  }, [state, dispatch, setSearchParams]);
+
+  const handlePageChange = useCallback(
+    (newPage) => {
+      setSearchParams((prev) => ({ ...prev, page: newPage }));
+    },
+    [setSearchParams]
+  );
+
+  const handlePerPageChange = useCallback(
+    (value) => {
+      setSearchParams((prev) => ({ ...prev, perPage: value, page: 1 }));
+    },
+    [setSearchParams]
+  );
+
+  if (isAuthLoading) {
     return (
-        <div className="app">
-            <MessageDialog message={errorMessage} onClose={() => setErrorMessage('')} />
-            <header className="app-header">
-                <div className="container header-content">
-                    <div id="car-finder-header-and-icon">
-                        <CarFinderIcon />
-                        <h1 className="header-title">Car Workshop Finder</h1>
-                    </div>
-                    {userId && <p className="user-id">User ID: {userId}</p>}
-                </div>
-            </header>
-
-            <main className="container main-content">
-                <Filters
-                    brandOptions={availableFilters.brands}
-                    onSearch={handleSearch}
-                    isLoading={isLoading}
-                />
-
-                {isWorkshopsLoading && searchParams.perPage !== 'All' && <Spinner />}
-
-                {!isWorkshopsLoading && workshops.length === 0 && !workshopsError && (
-                    <p className="no-results-message">No workshops found for the selected criteria.</p>
-                )}
-                
-                {workshops.length > 0 && (
-                    <>
-                        <div className="workshops-grid">
-                            {workshops.map(ws => (
-                                <MemoizedWorkshopCard
-                                    key={ws.hashedKhCode}
-                                    ws={ws}
-                                    isFav={favorites.some(f => f.id === ws.hashedKhCode)}
-                                    onToggleFav={() => toggleFav(ws)}
-                                    countryCode={searchParams.country}
-                                />
-                            ))}
-                        </div>
-
-                        {searchParams.perPage !== 'All' && (
-                            <Pagination
-                                page={pagination.page}
-                                totalPages={pagination.totalPages}
-                                onPageChange={handlePageChange}
-                                isLoading={isLoading}
-                            />
-                        )}
-                       
-                        {searchParams.perPage === 'All' && (
-                            <div ref={bottomRef} style={{ padding: '20px', textAlign: 'center' }}>
-                                {isFetchingMore ? (
-                                    <Spinner />
-                                ) : hasMore ? (
-                                    <p>Scroll down to load more workshops...</p>
-                                ) : (
-                                    <p>You've reached the end of the list!</p>
-                                )}
-                            </div>
-                        )}
-                    </>
-                )}
-            </main>
-           
-            <FavoritesDrawer
-                favorites={favorites}
-                onToggleFav={toggleFav}
-            />
-        </div>
+      <div className="initial-loading-container">
+        <Spinner />
+        <p className="initial-loading-text">Initializing...</p>
+      </div>
     );
+  }
+
+  return (
+    <div className="app">
+      <MessageDialog
+        message={errorMessage}
+        onClose={() => setErrorMessage('')}
+      />
+      <header className="app-header">
+        <div className="container header-content">
+          <div id="car-finder-header-and-icon">
+            <CarFinderIcon />
+            <h1 className="header-title">Car Workshop Finder</h1>
+          </div>
+          {userId && <p className="user-id">User ID: {userId}</p>}
+        </div>
+      </header>
+
+      <main className="container main-content">
+        <Filters
+          brandOptions={availableFilters.brands}
+          onSearch={handleSearch}
+          isLoading={isLoading}
+        />
+
+        {isWorkshopsLoading && searchParams.perPage !== 'All' && <Spinner />}
+
+        {!isWorkshopsLoading && workshops.length === 0 && !workshopsError && (
+          <p className="no-results-message">
+            No workshops found for the selected criteria.
+          </p>
+        )}
+
+        {workshops.length > 0 && (
+          <>
+            <div className="workshops-grid">
+              {workshops.map((ws) => (
+                <MemoizedWorkshopCard
+                  key={ws.hashedKhCode}
+                  ws={ws}
+                  isFav={favorites.some((f) => f.id === ws.hashedKhCode)}
+                  onToggleFav={() => toggleFav(ws)}
+                  countryCode={searchParams.country}
+                />
+              ))}
+            </div>
+
+            {searchParams.perPage !== 'All' && (
+              <Pagination
+                page={pagination.page}
+                totalPages={pagination.totalPages}
+                onPageChange={handlePageChange}
+                isLoading={isLoading}
+              />
+            )}
+
+            {searchParams.perPage === 'All' && (
+              <div
+                ref={bottomRef}
+                style={{ padding: '20px', textAlign: 'center' }}
+              >
+                {isFetchingMore ? (
+                  <Spinner />
+                ) : hasMore ? (
+                  <p>Scroll down to load more workshops...</p>
+                ) : (
+                  <p>You've reached the end of the list!</p>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </main>
+
+      <FavoritesDrawer favorites={favorites} onToggleFav={toggleFav} />
+    </div>
+  );
 }
