@@ -8,13 +8,6 @@ const Filters = ({ brandOptions = [], onSearch, isLoading }) => {
     const { state, dispatch } = useStateContext();
     const { country, perPage, availability, brand, searchQuery } = state;
 
-    const handleFilterChange = (e) => {
-        dispatch({
-            type: 'SET_FILTERS',
-            payload: { [e.target.name]: e.target.value }
-        });
-    };
-
     return (
         <div className="filters-container">
             <div className="filters-grid">
@@ -36,7 +29,7 @@ const Filters = ({ brandOptions = [], onSearch, isLoading }) => {
                         id="perPage"
                         name="perPage"
                         value={perPage}
-                        onChange={handleFilterChange}
+                        onChange={(e) => dispatch({ type: 'SET_PER_PAGE', payload: e.target.value })}
                         className="filter-select"
                     >
                         <option value="10">10</option>
@@ -53,7 +46,7 @@ const Filters = ({ brandOptions = [], onSearch, isLoading }) => {
                         id="country"
                         name="country"
                         value={country}
-                        onChange={handleFilterChange}
+                        onChange={(e) => dispatch({ type: 'SET_COUNTRY', payload: e.target.value })}
                         className="filter-select"
                     >
                         {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
@@ -65,7 +58,7 @@ const Filters = ({ brandOptions = [], onSearch, isLoading }) => {
                         id="availability"
                         name="availability"
                         value={availability}
-                        onChange={handleFilterChange}
+                        onChange={(e) => dispatch({ type: 'SET_AVAILABILITY', payload: e.target.value })}
                         className="filter-select"
                     >
                         {OPEN_HOURS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.name}</option>)}
@@ -77,7 +70,7 @@ const Filters = ({ brandOptions = [], onSearch, isLoading }) => {
                         id="brand"
                         name="brand"
                         value={brand}
-                        onChange={handleFilterChange}
+                        onChange={(e) => dispatch({ type: 'SET_BRAND', payload: e.target.value })}
                         className="filter-select"
                         disabled={brandOptions.length === 0}
                     >
