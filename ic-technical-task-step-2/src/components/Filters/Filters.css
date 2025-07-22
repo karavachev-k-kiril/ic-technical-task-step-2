@@ -60,6 +60,12 @@
   grid-column: span 1 / span 1;
 }
 
+#searchQuery{
+    width: unset !important;
+    height: unset !important;
+    padding: 0.7rem 2.5rem 0.5rem 0.75rem !important;
+}
+
 .search-button {
   display: flex;
   flex-direction: row;
