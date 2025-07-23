@@ -16,7 +16,7 @@ export interface Workshop {
   address: Address | null;
   phoneNumber: string | null;
   reviews: Reviews | null;
-  countryCode?: string; 
+  countryCode?: string; // Optional because it's added on the client-side for favorites
 }
 
 export interface Brand {
@@ -32,6 +32,7 @@ export interface PaginationInfo {
   total: number;
 }
 
+// This interface represents the full structure of the API response.
 export interface APIResponse {
   results: Workshop[];
   filters: {
