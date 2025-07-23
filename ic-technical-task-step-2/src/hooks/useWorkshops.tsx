@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { API_URL } from '../constants';
 import { Workshop, PaginationInfo, Brand, APIResponse } from '../constants/types';
 
-// Define a type for the search parameters for clarity and reusability
 interface SearchParams {
     country: string;
     page: number;
@@ -12,7 +11,6 @@ interface SearchParams {
     query: string;
 }
 
-// Define a type for the parameters passed to the fetch function
 interface FetchParams {
     country: string;
     pageToFetch: number;
@@ -28,7 +26,6 @@ export const useWorkshops = (initialCountry: string, initialPage: number, initia
     const [error, setError] = useState<string | null>(null);
     const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, perPage: 10, totalPages: 1, total: 0 });
     const [availableFilters, setAvailableFilters] = useState<{ brands: Brand[] }>({ brands: [] });
-
     const [searchParams, setSearchParams] = useState<SearchParams>({
         country: initialCountry,
         page: initialPage,
@@ -37,7 +34,6 @@ export const useWorkshops = (initialCountry: string, initialPage: number, initia
         brand: '-',
         query: '',
     });
-
     const [infiniteScrollPage, setInfiniteScrollPage] = useState<number>(1);
     const [hasMore, setHasMore] = useState<boolean>(true);
     const [isFetchingMore, setIsFetchingMore] = useState<boolean>(false);
@@ -54,7 +50,7 @@ export const useWorkshops = (initialCountry: string, initialPage: number, initia
         try {
             let url = `${API_URL}?locale=en&market=${country}&page=${pageToFetch}&perPage=${perPageToFetch}`;
             if (availability && availability !== '-') {
-                url += `&availability=${availability}`;
+                 url += `&availability=${availability}`;
             }
             if (brand && brand !== '-') {
                 url += `&brands=${brand}`;
@@ -122,6 +118,7 @@ export const useWorkshops = (initialCountry: string, initialPage: number, initia
         } else {
             setInfiniteScrollPage(1);
             setHasMore(false);
+  
             performFetch(fetchParams, false)
                 .finally(() => setIsLoading(false));
         }
