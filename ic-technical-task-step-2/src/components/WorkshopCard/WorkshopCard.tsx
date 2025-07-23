@@ -5,6 +5,7 @@ import Reviews from '../Reviews/Reviews';
 import './WorkshopCard.css';
 import { Workshop } from '../../constants/types';
 
+// Define the interface for the component's props for strict type-checking
 interface WorkshopCardProps {
     ws: Workshop;
     isFav: boolean;
@@ -14,7 +15,7 @@ interface WorkshopCardProps {
 
 const WorkshopCard: React.FC<WorkshopCardProps> = ({ ws, isFav, onToggleFav, countryCode }) => {
     const linkUrl = `https://motointegrator.com/${countryCode.toLowerCase()}/en/carworkshop/${ws.address?.localitySlug}/${ws.hashedKhCode}-${ws.slug}`;
-
+    
     // Type the event parameter for the image error handler
     const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement, Event>) => {
         e.currentTarget.onerror = null;
