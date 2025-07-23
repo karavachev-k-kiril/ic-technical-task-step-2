@@ -1,13 +1,12 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { reducer, initialState } from '../reducer';
-import { State } from '../constants/types';
+import React, { createContext, useContext, useReducer, ReactNode, Dispatch } from 'react';
+import { reducer, initialState, AppState, Action } from '../reducer';
 
-interface StateContextType {
-  state: State;
-  dispatch: React.Dispatch<any>;
+interface StateContextProps {
+  state: AppState;
+  dispatch: Dispatch<Action>;
 }
 
-const StateContext = createContext<StateContextType | undefined>(undefined);
+const StateContext = createContext<StateContextProps | undefined>(undefined);
 
 export const StateProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -19,7 +18,7 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useStateContext = (): StateContextType => {
+export const useStateContext = (): StateContextProps => {
   const context = useContext(StateContext);
   if (context === undefined) {
     throw new Error('useStateContext must be used within a StateProvider');
