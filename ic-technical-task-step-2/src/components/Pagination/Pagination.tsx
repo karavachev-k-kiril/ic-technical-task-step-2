@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import type { JSX } from 'react';
 import './Pagination.css';
 
 interface PaginationProps {
