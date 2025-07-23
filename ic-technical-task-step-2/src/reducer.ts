@@ -1,12 +1,20 @@
-import { State } from './constants/types';
+export interface AppState {
+  country: string;
+  perPage: string;
+  availability: string;
+  brand: string;
+  searchQuery: string;
+}
 
-// Define the shape of all possible actions
-type Action =
-  | { type: 'SET_FILTERS'; payload: Partial<State> }
+export type Action =
+  | { type: 'SET_COUNTRY'; payload: string }
+  | { type: 'SET_PER_PAGE'; payload: string }
+  | { type: 'SET_AVAILABILITY'; payload: string }
+  | { type: 'SET_BRAND'; payload:string }
   | { type: 'SET_SEARCH_QUERY'; payload: string }
   | { type: 'HANDLE_SEARCH' };
 
-export const initialState: State = {
+export const initialState: AppState = {
   country: 'PL',
   perPage: '10',
   availability: '-',
@@ -14,14 +22,20 @@ export const initialState: State = {
   searchQuery: '',
 };
 
-export function reducer(state: State, action: Action): State {
+export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
-    case 'SET_FILTERS':
-      return { ...state, ...action.payload, page: 1 };
+    case 'SET_COUNTRY':
+      return { ...state, country: action.payload };
+    case 'SET_PER_PAGE':
+      return { ...state, perPage: action.payload };
+    case 'SET_AVAILABILITY':
+      return { ...state, availability: action.payload };
+    case 'SET_BRAND':
+      return { ...state, brand: action.payload };
     case 'SET_SEARCH_QUERY':
       return { ...state, searchQuery: action.payload };
     case 'HANDLE_SEARCH':
-      return { ...state, page: 1 };
+      return { ...state };
     default:
       throw new Error(`Unknown action type`);
   }
